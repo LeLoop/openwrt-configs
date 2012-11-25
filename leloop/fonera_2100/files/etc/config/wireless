@@ -1,0 +1,13 @@
+config wifi-device  wlan0
+    option type     mac80211
+    option channel  11
+    option path 'platform/ar231x-wmac.0'
+
+config wifi-iface
+    option device   wlan0
+    option network  lan
+    option mode     ap
+    option ssid         LeLoop
+    option encryption   psk2
+    option key          leloopxp
+

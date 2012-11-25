@@ -1,0 +1,28 @@
+Push image:
+
+Host
+while true; do ifconfig eth0 192.168.1.2 && sleep 10; done
+/etc/init.d/in.tftpd start
+
+while true; do telnet 192.168.1.1 9000 ; done
+Note: the ip might also be 192.168.1.254, check the gratuious ARP requests.
+If the only arp packets you see, are for 0.0.0.0, you will have to do this:
+http://wiki.openwrt.org/toh/fon/fonera#replace.the.kernel.to.disable.write.protection
+
+
+Redboot:
+ip_address -l 192.168.1.1/24 # useless?? if you change in on the fly, you lose the connection to the box
+ip_address -h 192.168.1.2
+fis init
+load -r -v -b 0x80041000 openwrt-atheros-vmlinux.lzma
+fis create kernel
+load -r -v -b 0x80041000 openwrt-atheros-root.squashfs
+fis create rootfs
+reset
+
+Optional:
+fconfig
+fis load -l kernel
+exec
+
+
