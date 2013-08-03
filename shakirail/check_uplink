@@ -1,0 +1,25 @@
+#!/bin/sh
+
+ps aufx | grep 'check_uplink' | grep -v grep | grep -v $$ | grep . && exit 0
+
+gateway=`route | grep default | tr -s ' ' | cut -d ' ' -f 2`
+
+if [ -n "$gateway" ]; then
+    if ! ping -c 4 -q $gateway | grep '100% packet loss'; then
+        if ! ping -c 4 -q 8.8.8.8 | grep '100% packet loss'; then
+            exit 0
+        fi
+    fi
+fi
+
+iwlist ath0 scan | awk '/ESSID/ { essid = split($0,essid,"\"") } /Quality=/ { gsub("/70$","",$1); print substr($1,9), essid[2] }' | sort -rn \
+  | while read qual essid; do
+    if [ -f /etc/config/wireless.$essid ]; then
+        ln -sf /etc/config/wireless.$essid /etc/config/wireless
+        uci commit wireless
+        /etc/init.d/network restart
+        sleep 60 && ping -q -c 4 8.8.8.8 | grep '100% packet loss' && exit 0
+    fi
+done
+
+exit 1

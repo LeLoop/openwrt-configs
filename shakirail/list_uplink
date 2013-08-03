@@ -1,0 +1,3 @@
+#!/bin/sh
+
+iwlist ath0 scan | awk '/ESSID/ { essid = split($0,essid,"\"") } /Quality=/ { gsub("/70$","",$1); print substr($1,9), essid[2] }' | sort -rn
